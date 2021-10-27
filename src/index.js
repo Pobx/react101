@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
 import Todos from "./pages/Todos";
+import Person from "./pages/Person";
 
 function Footbal() {
   const shoot = (event) => {
@@ -116,6 +117,10 @@ function AppRouters() {
         <Link to="/contact">Contact</Link>
       </div>
 
+      <div>
+        <Link to="/person">Person</Link>
+      </div>
+
       <hr />
 
       <Switch>
@@ -129,6 +134,10 @@ function AppRouters() {
 
         <Route path="/contact">
           <Contact />
+        </Route>
+
+        <Route path="/person">
+          <Person />
         </Route>
       </Switch>
     </Router>
