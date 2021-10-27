@@ -8,7 +8,6 @@ function Person() {
   };
 
   const [person, setPerson] = useState(personObj);
-
   const updatePerson = () => {
     setPerson((prev) => {
       return { ...prev, name: "Geidtiphong Singseewo", age: 34 };
@@ -18,9 +17,14 @@ function Person() {
   return (
     <>
       <h1>Person Properties</h1>
+      <button type="button" onClick={updatePerson}>
+        Update Person
+      </button>
       <p>Name: {person.name}</p>
       <p>Age: {person.age}</p>
       <p>Job: {person.job}</p>
     </>
   );
 }
+
+export default Person
