@@ -1,4 +1,5 @@
-import React, { memo } from "react";
+// import React, { memo } from "react";
+import React from "react";
 
 function Todos({ todos }) {
   console.log("child render");
