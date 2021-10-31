@@ -42,11 +42,15 @@ function Garage() {
 }
 
 function MyForm() {
+	const [collection, setCollection] = useState([]);
 	const [inputs, setInputs] = useState({});
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		console.log(inputs);
+
+		setCollection((prevCollection) => [...prevCollection, inputs])
 	};
+
 	const handleChange = (event) => {
 		console.log(event);
 		const name = event.target.name;
@@ -56,34 +60,42 @@ function MyForm() {
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<label>FirstName:</label>
-			<input type="text" name="firstName" value={inputs.firstName || ''} onChange={handleChange} />
+		<>
+			<form onSubmit={handleSubmit}>
+				<label>FirstName:</label>
+				<input type="text" name="firstName" value={inputs.firstName || ''} onChange={handleChange} />
+
+				<br />
+
+				<label>LastName:</label>
+				<input type="text" name="lastName" value={inputs.lastName || ''} onChange={handleChange} />
+
+				<br />
+
+				<label>Address:</label>
+				<textarea type="text" name="address" value={inputs.address || ''} onChange={handleChange} />
+
+				<br />
+
+				<label>Car:</label>
+				<select name="car" value={inputs.car || ''} onChange={handleChange}>
+					<option value="">--Select--</option>
+					<option value="Ford">Ford</option>
+					<option value="Volvo">Volvo</option>
+					<option value="Fiat">Fiat</option>
+				</select>
+
+				<br />
+
+				<input type="submit" />
+			</form>
 
 			<br />
 
-			<label>LastName:</label>
-			<input type="text" name="lastName" value={inputs.lastName || ''} onChange={handleChange} />
-
-			<br />
-
-			<label>Address:</label>
-			<textarea type="text" name="address" value={inputs.address || ''} onChange={handleChange} />
-
-			<br />
-
-			<label>Car:</label>
-			<select name="car" value={inputs.car || ''} onChange={handleChange}>
-				<option value="">--Select--</option>
-				<option value="Ford">Ford</option>
-				<option value="Volvo">Volvo</option>
-				<option value="Fiat">Fiat</option>
-			</select>
-
-			<br />
-
-			<input type="submit" />
-		</form>
+			{collection.map((item, key) => (
+				<pre key={key}>{key} {JSON.stringify(item)}</pre>
+			))}
+		</>
 	);
 }
 
@@ -185,10 +197,14 @@ function UseEffectFetchData() {
 	// 		.then((json) => setAlbums(json));
 	// }, []);
 
-	useEffect(() => {
+	const getData =(resourceType) => {
 		fetch(`https://jsonplaceholder.typicode.com/${resourceType}`)
-			.then((response) => response.json())
-			.then((json) => setContent(json));
+		.then((response) => response.json())
+		.then((json) => setContent(json));
+	}
+
+	useEffect(() => {
+		getData(resourceType)
 	}, [resourceType]);
 
 	return (
@@ -207,7 +223,6 @@ function UseEffectFetchData() {
 			{content.map((item, key) => (
 				<pre key={key}>{JSON.stringify(item)}</pre>
 			))}
-			albums
 		</>
 	);
 }
@@ -218,23 +233,45 @@ function Page1() {
 	const [count, setCount] = useState(0);
 	return (
 		<CountContext.Provider value={count}>
-      <button type="button" onClick={() => setCount(prevValue => prevValue + 1)}>Click + 1</button>
+			<button type="button" onClick={() => setCount((prevValue) => prevValue + 1)}>
+				Click + 1
+			</button>
 			<br />
-      <Page2 />
+			<Page2 />
 			<br />
-			<Page3 />
+			{/* <Page3 /> */}
 		</CountContext.Provider>
 	);
 }
 
 function Page2() {
 	const count = useContext(CountContext);
-	return <> Page2 Count is : {count}</>;
+	return <> Page2 Count is : {count} <Page3 /></>;
 }
 
 function Page3() {
 	const count = useContext(CountContext);
 	return <>Page3 Count is : {count}</>;
+}
+
+function CountState() {
+	const [count, setCount] = useState(0);
+	// function updateCount() {
+	// 	setCount((prevValue) => prevValue + 1)
+	// }
+	const updateCount = (event) => {
+		console.log(event);
+		setCount((prevValue) => prevValue + 1);
+	};
+
+	return (
+		<>
+			Count is {count}
+			<button type="button" onClick={(event) => updateCount(event)}>
+				Add 1
+			</button>
+		</>
+	);
 }
 
 ReactDOM.render(
@@ -245,8 +282,11 @@ ReactDOM.render(
 		<AppRouters />
 		<AppCount />
 		<Timer />
-		<UseEffectFetchData /> */}
-    <Page1 />
+		 */}
+		{/* <CountState /> */}
+		{/* <MyForm /> */}
+		{/* <UseEffectFetchData /> */}
+		<Page1 />
 	</React.StrictMode>,
 	document.getElementById('root')
 );
