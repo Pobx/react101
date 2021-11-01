@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
@@ -48,7 +48,7 @@ function MyForm() {
 		event.preventDefault();
 		console.log(inputs);
 
-		setCollection((prevCollection) => [...prevCollection, inputs])
+		setCollection((prevCollection) => [...prevCollection, inputs]);
 	};
 
 	const handleChange = (event) => {
@@ -93,7 +93,9 @@ function MyForm() {
 			<br />
 
 			{collection.map((item, key) => (
-				<pre key={key}>{key} {JSON.stringify(item)}</pre>
+				<pre key={key}>
+					{key} {JSON.stringify(item)}
+				</pre>
 			))}
 		</>
 	);
@@ -197,14 +199,14 @@ function UseEffectFetchData() {
 	// 		.then((json) => setAlbums(json));
 	// }, []);
 
-	const getData =(resourceType) => {
+	const getData = (resourceType) => {
 		fetch(`https://jsonplaceholder.typicode.com/${resourceType}`)
-		.then((response) => response.json())
-		.then((json) => setContent(json));
-	}
+			.then((response) => response.json())
+			.then((json) => setContent(json));
+	};
 
 	useEffect(() => {
-		getData(resourceType)
+		getData(resourceType);
 	}, [resourceType]);
 
 	return (
@@ -246,7 +248,12 @@ function Page1() {
 
 function Page2() {
 	const count = useContext(CountContext);
-	return <> Page2 Count is : {count} <Page3 /></>;
+	return (
+		<>
+			{' '}
+			Page2 Count is : {count} <Page3 />
+		</>
+	);
 }
 
 function Page3() {
@@ -274,6 +281,199 @@ function CountState() {
 	);
 }
 
+function MyUseRef() {
+	const [inputValue, setInputValue] = useState('');
+	const count = useRef(0);
+
+	useEffect(() => {
+		count.current = count.current + 1;
+		console.log(count.current);
+	});
+
+	return (
+		<>
+			<input type="text" value={inputValue} onChange={(event) => setInputValue(event.target.value)} />
+			<h1>render Count: {count.current}</h1>
+		</>
+	);
+}
+
+function MyUseRefFocus() {
+	const inputElement = useRef();
+	const focusInput = () => {
+		console.log(inputElement);
+		inputElement.current.focus();
+	};
+
+	return (
+		<>
+			<input type="text" ref={inputElement} />
+			<button type="button" onClick={focusInput}>
+				Focus Input
+			</button>
+		</>
+	);
+}
+
+function MyuseRefTrackingChange() {
+	const [inputValue, setInputValue] = useState('');
+	const previousInputValue = useRef('');
+
+	useEffect(() => {
+		previousInputValue.current = inputValue;
+	}, [inputValue]);
+
+	return (
+		<>
+			<input type="text" value={inputValue} onChange={(event) => setInputValue(event.target.value)} />
+			<p>Current Value: {inputValue}</p>
+			<p>Previous Value: {previousInputValue.current}</p>
+		</>
+	);
+}
+
+const initialTodos = [
+	{ id: 1, title: 'Todo 1', complete: false },
+	{ id: 2, title: 'Todo 2', complete: false },
+];
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'COMPLETE':
+			return state.map((todo) => {
+				if (todo.id === action.id) {
+					return { ...todo, complete: !todo.complete };
+				} else {
+					return todo;
+				}
+			});
+
+		default:
+			return state;
+	}
+};
+
+function TodosReducer() {
+	const [todos, dispatch] = useReducer(reducer, initialTodos);
+	const handleComplete = (todo) => {
+		dispatch({ type: 'COMPLETE', id: todo.id });
+	};
+
+	return (
+		<>
+			{todos.map((todo) => (
+				<div key={todo.id}>
+					<label>
+						<input type="checkbox" checked={todo.complete} onChange={() => handleComplete(todo)} />
+						{todo.title}
+					</label>
+				</div>
+			))}
+		</>
+	);
+}
+
+const RenderCounter = () => {
+	const counter = useRef(0);
+
+	// Since the ref value is updated in the render phase,
+	// the value can be incremented more than once
+	// counter.current = counter.current + 1;
+
+	useEffect(() => {
+		// Every time the component has been re-rendered,
+		// the counter is incremented
+		counter.current = counter.current + 1;
+	});
+
+	return <h1>{`The component has been re-rendered ${JSON.stringify(counter)} times`}</h1>;
+};
+
+function MyUseRef2() {
+	const [name, setName] = useState('');
+	const renderCount = useRef(0);
+	const input = useRef();
+
+	useEffect(() => {
+		renderCount.current = renderCount.current + 1;
+	});
+
+	const onFocus = () => {
+		input.current.focus();
+		input.current.value = 'Hello Pobx';
+	};
+
+	return (
+		<>
+			<input ref={input} value={name} onChange={(e) => setName(e.target.value)} />
+			<p>My name is {name}</p>
+			<p>Rendered is {renderCount.current}</p>
+
+			<button type="button" onClick={onFocus}>
+				Focus
+			</button>
+		</>
+	);
+}
+
+function LogButtonClicks() {
+	const countRef = useRef(0);
+	const [count, setCount] = useState(0);
+
+	const handle = () => {
+		// countRef.current++;
+		// console.log(`Clicked ${countRef.current} times`);
+		const updatedCount = count + 1;
+		console.log(`Clicked ${updatedCount} times`);
+		setCount(updatedCount);
+	};
+	console.log('I rendered!');
+
+	return (
+		<>
+			{/* <p>{countRef.current}</p> */}
+			<p>{count}</p>
+			<button onClick={handle}>Click me</button>
+		</>
+	);
+}
+
+function StopWatch() {
+	const timerIdRef = useRef(0);
+	const [count, setCount] = useState(0);
+	const startHandler = () => {
+		if (timerIdRef.current) {
+			return;
+		}
+
+		timerIdRef.current = setInterval(() => setCount((c) => c + 1), 1000);
+    console.log(timerIdRef.current)
+	};
+
+	const stopHandler = () => {
+		clearInterval(timerIdRef.current);
+		timerIdRef.current = 0;
+	};
+
+	useEffect(() => {
+		return () => clearInterval(timerIdRef);
+	}, []);
+
+	return (
+		<>
+			<div>Timer: {count}</div>
+			<div>
+				<button type="button" onClick={startHandler}>
+					Start
+				</button>
+				<button type="button" onClick={stopHandler}>
+					Stop
+				</button>
+			</div>
+		</>
+	);
+}
+
 ReactDOM.render(
 	<React.StrictMode>
 		{/* <Footbal />
@@ -286,7 +486,15 @@ ReactDOM.render(
 		{/* <CountState /> */}
 		{/* <MyForm /> */}
 		{/* <UseEffectFetchData /> */}
-		<Page1 />
+		{/* <Page1 /> */}
+		{/* <MyUseRef /> */}
+		{/* <MyUseRefFocus /> */}
+		{/* <MyuseRefTrackingChange /> */}
+		{/* <TodosReducer /> */}
+		{/* <RenderCounter /> */}
+		{/* <MyUseRef2 /> */}
+		{/* <LogButtonClicks /> */}
+    <StopWatch />
 	</React.StrictMode>,
 	document.getElementById('root')
 );
