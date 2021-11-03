@@ -447,7 +447,7 @@ function StopWatch() {
 		}
 
 		timerIdRef.current = setInterval(() => setCount((c) => c + 1), 1000);
-    console.log(timerIdRef.current)
+		console.log(timerIdRef.current);
 	};
 
 	const stopHandler = () => {
@@ -474,6 +474,93 @@ function StopWatch() {
 	);
 }
 
+function Greet({ name }) {
+	const message = `Hello, ${name}`;
+	// document.title = `Greetings to ${name}`;
+	useEffect(() => {
+		document.title = `Greetings to ${name}`;
+	}, [name]);
+	return <>{message}</>;
+}
+
+function reducer2(state, action) {
+	switch (action.type) {
+		case 'increment':
+			return { count: state.count + 1 };
+		case 'decrement':
+			return { count: state.count - 1 };
+
+		default:
+			return state;
+	}
+}
+
+function MyReducer() {
+	const [state, dispatch] = useReducer(reducer2, { count: 0 });
+
+	const increment = () => dispatch({ type: 'increment' });
+	const decrement = () => dispatch({ type: 'decrement' });
+
+	return (
+		<>
+			<button type="button" onClick={decrement}>
+				-
+			</button>
+			<span>{state.count}</span>
+			<button type="button" onClick={increment}>
+				+
+			</button>
+		</>
+	);
+}
+
+const ACTIONS = {
+	ADD_TODO: 'add-todo',
+	DELETE_TODO: 'delete-todo',
+};
+
+function newTodo(name) {
+	return { id: Date.now(), name: name, complete: false };
+}
+
+function reducer3(todos, action) {
+	switch (action.type) {
+		case ACTIONS.ADD_TODO:
+			return [...todos, newTodo(action.playload.name)];
+		case ACTIONS.DELETE_TODO:
+			return todos.filter((item) => item.id !== action.playload.id);
+		default:
+			return todos;
+	}
+}
+
+function MyReducer3() {
+	const [todos, dispatch] = useReducer(reducer3, []);
+	const [name, setName] = useState('');
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		dispatch({ type: ACTIONS.ADD_TODO, playload: { name: name } });
+		setName('');
+	};
+
+	return (
+		<>
+			<form onSubmit={handleSubmit}>
+				<input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+				<input type="submit" value="Add New" />
+			</form>
+
+			<br />
+
+			{todos.map((item, index) => (
+				<div key={index}>
+					{item.name} <button onClick={() => dispatch({ type: ACTIONS.DELETE_TODO, playload: { id: item.id } })}>Delete</button>
+				</div>
+			))}
+		</>
+	);
+}
+
 ReactDOM.render(
 	<React.StrictMode>
 		{/* <Footbal />
@@ -494,7 +581,10 @@ ReactDOM.render(
 		{/* <RenderCounter /> */}
 		{/* <MyUseRef2 /> */}
 		{/* <LogButtonClicks /> */}
-    <StopWatch />
+		{/* <StopWatch /> */}
+		{/* <Greet name="Pobx" /> */}
+		{/* <MyReducer /> */}
+		<MyReducer3 />
 	</React.StrictMode>,
 	document.getElementById('root')
 );
